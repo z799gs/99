@@ -7,44 +7,151 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/netclassroom/998800@main/n/TemplateData/favicon.ico">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/netclassroom/998800@main/n/TemplateData/style.css">
+    <meta charset="utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/z799gs/99@main/TemplateData/style.css"/>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
 
+      body {
+        background: #0a0a1a;
+        overflow: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      #unity-container {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+      }
+
+      #unity-canvas {
+        width: 100%;
+        height: 100%;
+        background: #0a0a1a;
+      }
+
+      /* ==================== LOADING SCREEN ==================== */
+      #custom-loading {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0a1628 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        transition: opacity 0.8s ease;
+      }
+
+      #custom-loading.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .loading-icon {
+        font-size: 56px;
+        margin-bottom: 20px;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.15); opacity: 0.8; }
+      }
+
+      .loading-title {
+        font-size: 36px;
+        font-weight: 900;
+        color: #00d4ff;
+        text-shadow: 0 0 20px rgba(0, 212, 255, 0.4), 0 4px 8px rgba(0,0,0,0.5);
+        margin-bottom: 8px;
+        letter-spacing: 4px;
+      }
+
+      .loading-subtitle {
+        font-size: 13px;
+        color: #6080a0;
+        margin-bottom: 35px;
+        letter-spacing: 1px;
+      }
+
+      .progress-container {
+        width: 380px;
+        margin-bottom: 12px;
+      }
+
+      .progress-bar-bg {
+        width: 100%;
+        height: 20px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #0066ff, #00d4ff, #0066ff);
+        background-size: 200% 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+        animation: shimmer 1.5s linear infinite;
+      }
+
+      @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      .progress-text {
+        color: #00d4ff;
+        font-size: 15px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 8px;
+      }
+
+      .loading-status {
+        color: #5a7a9a;
+        font-size: 12px;
+        margin-top: 4px;
+        text-align: center;
+        min-height: 18px;
+      }
+
+      .fun-message {
+        color: #8090b0;
+        font-size: 13px;
+        margin-top: 25px;
+        font-style: italic;
+        opacity: 0.7;
+        text-align: center;
+        min-height: 20px;
+        transition: opacity 0.3s ease;
+      }
+    </style>
   </head>
-  <body>
+  <body class="dark">
     <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600></canvas>
+      <canvas id="unity-canvas"></canvas>
 
       <!-- CUSTOM LOADING SCREEN -->
       <div id="custom-loading">
-        <div class="taco-container">
-          <span class="taco-emoji">🌮</span>
-        </div>
-        <div class="loading-title">TACO STAND</div>
-        <div class="loading-subtitle">Preparing the tastiest tacos...</div>
+        <div class="loading-icon">G+</div>
+        <div class="loading-title">LOADING</div>
+        <div class="loading-subtitle">Preparing game assets...</div>
         <div class="progress-container">
           <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="merge-progress-bar"></div>
           </div>
           <div class="progress-text" id="merge-progress-text">0%</div>
-          <div class="loading-status" id="merge-status">Initializing...</div>
+          <div class="loading-status" id="merge-status">Initializing... Xd?</div>
         </div>
         <div class="fun-message" id="fun-message"></div>
-      </div>
-
-      <div id="unity-loading-bar" style="display:none;">
-        <div id="unity-logo"></div>
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
-        </div>
-      </div>
-      <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-webgl-logo"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">g+</div>
       </div>
     </div>
 
@@ -53,16 +160,16 @@
       // FUN LOADING MESSAGES
       // ==========================================
       const funMessages = [
-        "Chopping onions and tomatoes... 🍅",
-        "Seasoning the meat just right... 🌶️",
-        "Warming up the tortillas... 🫓",
-        "Adding extra guacamole... 🥑",
-        "Squeezing fresh limes... 🍋",
-        "Taste-testing the salsa... 💃",
-        "Grilling to perfection... 🔥",
-        "Folding tacos with love... ❤️",
-        "Sprinkling cilantro on top... 🌿",
-        "Almost ready to serve! 🎉"
+        "Loading textures and shaders... 🎨",
+        "Building the world around you... 🌍",
+        "Placing all the objects... 📦",
+        "Waking up the NPCs... 🧑",
+        "Polishing the graphics... ✨",
+        "Tuning the physics engine... ⚙️",
+        "Syncing game logic... 🧠",
+        "Almost there, hang tight... 🚀",
+        "Final touches in progress... 🎯",
+        "Get ready to play! 🏆"
       ];
 
       let funMsgIndex = 0;
@@ -72,7 +179,7 @@
         funMsgEl.style.opacity = '0';
         setTimeout(() => {
           funMsgEl.textContent = funMessages[funMsgIndex % funMessages.length];
-          funMsgEl.style.opacity = '0.8';
+          funMsgEl.style.opacity = '0.7';
           funMsgIndex++;
         }, 300);
       }
@@ -85,10 +192,10 @@
       // ==========================================
       const mergeConfig = {
         files: [
-          { name: 'web.data.gz', parts: 4 },
-          { name: 'web.wasm.gz', parts: 3 }
+          { name: 'game.data.br', parts: 4 },
+          { name: 'game.wasm.br', parts: 4 }
         ],
-        basePath: 'https://cdn.jsdelivr.net/gh/netclassroom/998800@main/n/Build/'
+        basePath: 'https://cdn.jsdelivr.net/gh/z799gs/99@main/Build/'
       };
 
       const mergedFiles = {};
@@ -104,9 +211,8 @@
           if (!response.ok) throw new Error(`Failed to load ${partUrl}: ${response.status}`);
 
           const reader = response.body.getReader();
-          const contentLength = +response.headers.get('Content-Length') || 0;
-          let received = 0;
           const partChunks = [];
+          let received = 0;
 
           while (true) {
             const { done, value } = await reader.read();
@@ -163,13 +269,12 @@
       }
 
       // ==========================================
-      // CUSTOM FETCH INTERCEPTOR
+      // FETCH INTERCEPTOR
       // ==========================================
       const originalFetch = window.fetch;
       window.fetch = function(url, options) {
         if (typeof url === 'string') {
           for (const file of mergeConfig.files) {
-            // Intercept requests for the original files and return merged data
             if (url.endsWith(file.name) || url.includes('/' + file.name)) {
               if (mergedFiles[file.name]) {
                 console.log(`[INTERCEPT] Serving merged: ${file.name}`);
@@ -185,83 +290,95 @@
       };
 
       // ==========================================
+      // XMLHttpRequest INTERCEPTOR (Unity fallback)
+      // ==========================================
+      const OrigXHR = XMLHttpRequest;
+      window.XMLHttpRequest = function() {
+        const xhr = new OrigXHR();
+        const origOpen = xhr.open;
+
+        xhr.open = function(method, url) {
+          this._url = url;
+          return origOpen.apply(this, arguments);
+        };
+
+        const origSend = xhr.send;
+        xhr.send = function(body) {
+          if (this._url && typeof this._url === 'string') {
+            for (const file of mergeConfig.files) {
+              if (this._url.endsWith(file.name) || this._url.includes('/' + file.name)) {
+                if (mergedFiles[file.name]) {
+                  console.log(`[XHR-INTERCEPT] Serving merged: ${file.name}`);
+                  const self = this;
+                  setTimeout(() => {
+                    Object.defineProperty(self, 'status', { get: () => 200 });
+                    Object.defineProperty(self, 'readyState', { get: () => 4 });
+                    Object.defineProperty(self, 'response', { get: () => mergedFiles[file.name] });
+                    Object.defineProperty(self, 'responseType', { get: () => 'arraybuffer' });
+                    if (self.onload) self.onload();
+                    if (self.onreadystatechange) self.onreadystatechange();
+                  }, 0);
+                  return;
+                }
+              }
+            }
+          }
+          return origSend.apply(this, arguments);
+        };
+
+        return xhr;
+      };
+      window.XMLHttpRequest.prototype = OrigXHR.prototype;
+      window.XMLHttpRequest.DONE = 4;
+      window.XMLHttpRequest.HEADERS_RECEIVED = 2;
+      window.XMLHttpRequest.LOADING = 3;
+      window.XMLHttpRequest.OPENED = 1;
+      window.XMLHttpRequest.UNSENT = 0;
+
+      // ==========================================
       // UNITY INIT
       // ==========================================
-      var container = document.querySelector("#unity-container");
-      var canvas = document.querySelector("#unity-canvas");
-      var loadingBar = document.querySelector("#unity-loading-bar");
-      var progressBarFull = document.querySelector("#unity-progress-bar-full");
-      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-      var warningBanner = document.querySelector("#unity-warning");
+      const container = document.querySelector('#unity-container');
+      const canvas = document.querySelector('#unity-canvas');
 
-      function unityShowBanner(msg, type) {
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-        }
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
-        else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
-            warningBanner.removeChild(div);
-            updateBannerVisibility();
-          }, 5000);
-        }
-        updateBannerVisibility();
-      }
-
-      var buildUrl = "https://cdn.jsdelivr.net/gh/netclassroom/998800@main/n/Build";
-      var loaderUrl = buildUrl + "/web.loader.js";
-      var config = {
-        dataUrl: buildUrl + "/web.data.gz",
-        frameworkUrl: buildUrl + "/web.framework.js",
-        codeUrl: buildUrl + "/web.wasm.gz",
-        streamingAssetsUrl: "https://cdn.jsdelivr.net/gh/netclassroom/998800@main/n/StreamingAssets",
-        companyName: "Wave Infinite",
-        productName: "Taco Stand",
-        productVersion: "0.1",
-        showBanner: unityShowBanner,
+      const buildUrl = 'https://cdn.jsdelivr.net/gh/z799gs/99@main/Build';
+      const loaderUrl = buildUrl + '/loader.js';
+      const config = {
+        dataUrl: buildUrl + '/game.data.br',
+        frameworkUrl: buildUrl + '/game.js',
+        codeUrl: buildUrl + '/game.wasm.br',
+        streamingAssetsUrl: '',
+        companyName: 'GAME',
+        productName: 'GAME',
+        productVersion: '1.0',
       };
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        container.className = "unity-mobile";
-        canvas.className = "unity-mobile";
-      } else {
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
+        container.className = 'unity-mobile';
+        config.devicePixelRatio = 1;
       }
 
-      // MAIN: Merge files first, then load Unity
+      // MAIN: Merge first, then load Unity
       mergeAllFiles().then(() => {
         clearInterval(funMsgInterval);
 
-        var script = document.createElement("script");
+        const script = document.createElement('script');
         script.src = loaderUrl;
-        script.onload = () => {
-          createUnityInstance(canvas, config, (progress) => {
-            // Unity engine loading progress
+        script.onload = function() {
+          createUnityInstance(canvas, config, function(progress) {
             const pct = Math.round(progress * 100);
             progressBar.style.width = pct + '%';
             progressText.textContent = pct + '%';
             statusEl.textContent = 'Loading game engine... ' + pct + '%';
-          }).then((unityInstance) => {
+          }).then(function(unityInstance) {
+            window.unityInstance = unityInstance;
             // Hide loading screen
             document.getElementById('custom-loading').classList.add('fade-out');
             setTimeout(() => {
               document.getElementById('custom-loading').style.display = 'none';
             }, 800);
-
-            fullscreenButton.onclick = () => {
-              unityInstance.SetFullscreen(1);
-            };
-          }).catch((message) => {
-            alert(message);
+          }).catch(function(message) {
+            console.warn(message);
           });
         };
         document.body.appendChild(script);
